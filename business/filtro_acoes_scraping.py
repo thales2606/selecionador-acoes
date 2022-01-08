@@ -3,8 +3,10 @@ from selenium.webdriver.support.ui import Select
 
 class FiltroAcoesScraping:
     checkSelectAll = '//*[@id="selectAll"]'
+    checkROI = '//*[@id="coluna5"]'
     checkMargemEBIT = '//*[@id="coluna10"]'
     checkEVEBIT = '//*[@id="coluna23"]'
+    checkDY = '//*[@id="coluna25"]'
     checkVolumeFinanceiro = '//*[@id="coluna26"]'
     checkMarketCap = '//*[@id="coluna27"]'
     inputVolumeFinanceiroMinimo = '//*[@id="tabela_seleciona_acoes"]/tbody/tr[24]/td[2]/input'
@@ -23,9 +25,11 @@ class FiltroAcoesScraping:
         select = Select(self.web_Scraping.get_element_by_xpath(
             self.select_numero_resultados))
         select.select_by_value('todos')
+        self.web_Scraping.click(self.checkROI)
         self.web_Scraping.click(self.checkMargemEBIT)
         self.web_Scraping.click(self.checkEVEBIT)
-        self.web_Scraping.click(self.checkVolumeFinanceiro)
+        self.web_Scraping.click(self.checkDY)
+        self.web_Scraping.click(self.checkVolumeFinanceiro)        
         self.web_Scraping.click(self.checkMarketCap)
         self.inserir_valor_em_campo(
             self.inputVolumeFinanceiroMinimo, self.volumeFinanceiroMinimo)
