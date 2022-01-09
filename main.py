@@ -22,16 +22,7 @@ try:
     df.columns = ['Ação', 'Empresa', 'Preço', 'ROInvC',
                   'Margem EBIT', 'EV/EBIT', 'DY', 'Volume Financ.(R$)', 'Market Cap (R$)']
     df = Filtros().aplicar_filtros(df)
-
-    for index, row in df.iterrows():
-        principais_indicadores_scraping.proximo(row['Ação'])
-        time.sleep(1)
-        divida_liquida = principais_indicadores_scraping.buscar_divida_liquida()
-        ebit = principais_indicadores_scraping.buscar_ebit()
-        quantidade_total_acoes = principais_indicadores_scraping.buscar_quantidade_total_acoes()
-        df.loc[index, 'Earning Yield'] = ebit / \
-            ((quantidade_total_acoes + divida_liquida) * row['Preço'])
-
+        
     df.to_excel(excel_writer='C:\\Users\\HOME\\OneDrive\\Finanças\\Rancking_acoes_brasileiras.xlsx',
                 sheet_name='Rancking de açoes Brasileiras')
 
