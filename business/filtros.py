@@ -43,6 +43,7 @@ class Filtros:
         return df
 
     def ordernar_roic_desc(self, df):
+        df['ROInvC'] = df['ROInvC'].str.replace(',','.').str.rstrip('%').astype('float') / 100.0
         df = df.sort_values("ROInvC", ascending=False)
         return df
 
