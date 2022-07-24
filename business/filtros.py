@@ -9,10 +9,10 @@ class Filtros:
         df = self.remover_margem_ebit_vazia(df)
         df = self.ordernar_ev_ebit_asc(df)
         df = self.ranquear_por_ev_ebit_asc(df)
-        df = self.ordernar_roic_desc(df)
-        df = self.ranquear_por_roic_desc(df)
-        df = self.gerar_rank_geral(df)
-        df = self.ordernar_rank_geral_asc(df)
+        # df = self.ordernar_roic_desc(df)
+        # df = self.ranquear_por_roic_desc(df)
+        # df = self.gerar_rank_geral(df)
+        # df = self.ordernar_rank_geral_asc(df)
         return df
 
     def retirar_seguradoras(self, df):
