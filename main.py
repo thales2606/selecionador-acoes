@@ -23,7 +23,7 @@ try:
                   'Margem EBIT', 'EV/EBIT', 'DY', 'Volume Financ.(R$)', 'Market Cap (R$)']
     df = Filtros().aplicar_filtros(df)
         
-    df.to_excel(excel_writer='C:\\Users\\HOME\\OneDrive\\Finanças\\Rancking_acoes_brasileiras.xlsx',
+    df.to_excel(excel_writer='C:\\Users\\thale\\OneDrive\\Finanças\\Rancking_acoes_brasileiras.xlsx',
                 sheet_name='Rancking de açoes Brasileiras')
 
 finally:
