@@ -1,0 +1,124 @@
+{
+    "filters": 
+    [
+        {
+            "name": "preco-sobre-lucro",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[1]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[1]/td[2]/span/input[2]"
+        },
+        {
+            "name": "preco-sobre-valor-patrimonial",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[2]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[2]/td[2]/span/input[2]"
+        },
+        {
+            "name": "preco-sobre-receita-liquida",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[3]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[3]/td[2]/span/input[2]"
+        },
+        {
+            "name": "dividend-yield",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[4]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[4]/td[2]/span/input[2]"
+        },
+        {
+            "name": "preco-sobre-ativos",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[5]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[5]/td[2]/span/input[2]"
+        },
+        {
+            "name": "preco-sobre-capital-de-giro",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[6]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[6]/td[2]/span/input[2]"
+        },
+        {
+            "name": "preco-sobre-ebit",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[7]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[7]/td[2]/span/input[2]"
+        },
+        {
+            "name": "preco-sobre-ativo-circulante-liquido",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[8]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[8]/td[2]/span/input[2]"
+        },
+        {
+            "name": "valor-da-empresa-sobre-ebit",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[9]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[9]/td[2]/span/input[2]"
+        },
+        {
+            "name": "valor-da-empresa-sobre-ebitda",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[10]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[10]/td[2]/span/input[2]"
+        },
+        {
+            "name": "margem-ebit",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[11]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[11]/td[2]/span/input[2]"
+        },
+        {
+            "name": "margem-liquida",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[12]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[12]/td[2]/span/input[2]"
+        },
+        {
+            "name": "liquidez-corrente",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[13]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[13]/td[2]/span/input[2]"
+        },
+        {
+            "name": "roic",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[14]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[14]/td[2]/span/input[2]"
+        },
+        {
+            "name": "roe",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[15]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[15]/td[2]/span/input[2]"
+        },
+        {
+            "name": "liquidez",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[16]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[16]/td[2]/span/input[2]"
+        },
+        {
+            "name": "patrimonio-liquido",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[17]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[17]/td[2]/span/input[2]"
+        },
+        {
+            "name": "divida-bruta-total-sobre-patrimonio-liquido",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[18]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[18]/td[2]/span/input[2]"
+        },
+        {
+            "name": "taxa-de-crescimento-da-receita-liquida",
+            "type": "min-max",
+            "minInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[19]/td[2]/span/input[1]",
+            "maxInputTextAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[19]/td[2]/span/input[2]"
+        },
+        {
+            "name": "setor",
+            "type": "select",
+            "selectComboBoxAddress": "/html/body/div[1]/div[2]/form/table/tbody/tr[20]/td[2]/select"
+        }
+    ]
+}

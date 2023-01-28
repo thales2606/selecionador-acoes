@@ -1,0 +1,14 @@
+FROM public.ecr.aws/lambda/python:3.9
+
+# Copy function code
+COPY lambda_function.py ${LAMBDA_TASK_ROOT}
+
+# Install the binary packages using yum install
+RUN yum install -y curl
+
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "lambda_function.lambda_handler" ]
+
+# CREATE IMAGE: docker build -t get-stoks-by-filter -f Dockerfile.df .
+# RUN IMAGE: docker run -p 9000:8080 -d get-stoks-by-filter
+# CALL: curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d {}
