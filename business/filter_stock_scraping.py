@@ -1,7 +1,7 @@
 from selenium.webdriver.support.ui import Select
 
 
-class FiltroAcoesScraping:
+class FilterStockScraping:
     buttonFindStoks = '/html/body/div[1]/div[2]/form/input'   
     def __init__(self, web_scraping):
         self.web_Scraping = web_scraping

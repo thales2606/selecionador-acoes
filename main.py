@@ -1,6 +1,5 @@
 import pandas
-from business.filter_stock_scraping import FiltroAcoesScraping
-from business.filtros import Filtros
+from business.filter_stock_scraping import FilterStockScraping
 from business.principais_indicadores_scraping import PrincipaisIndicadoresScraping
 from business.selecao_acoes_scraping import SelecaoAcoesScraping
 from business.webscraping import WebScraping
@@ -9,19 +8,13 @@ import json
 
 url = "https://www.fundamentus.com.br/buscaavancada.php"
 web_scraping = WebScraping(url)
-filtro_acoes_scraping = FiltroAcoesScraping(web_scraping)
+filtro_acoes_scraping = FilterStockScraping(web_scraping)
 selecao_acoes_scraping = SelecaoAcoesScraping(web_scraping)
 principais_indicadores_scraping = PrincipaisIndicadoresScraping(web_scraping)
 
 try:
     settings = json.load(open('settings.json'))
-    filter_types = ["valor-da-empresa-sobre-ebit", "margem-ebit"]
-    filters = []    
-    for filter in settings['filters']:
-        if filter['name'] in filter_types:
-            filter['minValue'] = '0'
-            filter['maxValue'] = ''
-            filters.append(filter)   
+    filters = []  
     
     filtro_acoes_scraping.filter(filters)
     time.sleep(2)
@@ -35,10 +28,8 @@ try:
                   'P/Cap.Giro', 'P/EBIT', 'P/Ativ Circ.Liq', 'EV/EBIT', 'EV/EBITDA', 
                   'Mrg Ebit', 'Mrg. Líq.', 'Liq. Corr.', 'ROIC', 'ROE', 'Liq.2meses', 
                   'Patrim. Líq', 'Dív.Brut/ Patrim.', 'Cresc. Rec.5a']
-    df = Filtros().aplicar_filtros(df)
-        
-    df.to_excel(excel_writer='C:\\Users\\thale\\OneDrive\\Área de Trabalho\\Rancking_acoes_brasileiras.xlsx',
-                sheet_name='Rancking de açoes Brasileiras')
+
+    json_result = df.to_json(orient = 'columns')
 
 finally:
     web_scraping.finalizar()
