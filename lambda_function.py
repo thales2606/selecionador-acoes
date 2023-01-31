@@ -6,6 +6,7 @@ from business.selecao_acoes_scraping import SelecaoAcoesScraping
 from business.webscraping import WebScraping
 import time
 
+
 def lambda_handler(event, context):
     url = "https://www.fundamentus.com.br/buscaavancada.php"
     web_scraping = WebScraping(url)
@@ -13,9 +14,18 @@ def lambda_handler(event, context):
     selecao_acoes_scraping = SelecaoAcoesScraping(web_scraping)
 
     try:
-        settings = json.load(open('settings.json')) 
-        
-        filtro_acoes_scraping.filter(event.filters)
+        settings = json.load(open('settings.json'))
+        for filter in event['filters']:
+            filterSettings = next(
+                x for x in settings['filters'] if x['name'] == filter['name'])
+            filter['type'] = filterSettings['type']
+            if filterSettings['type'] == 'min-max':
+                filter['minInputTextAddress'] = filterSettings['minInputTextAddress']
+                filter['maxInputTextAddress'] = filterSettings['maxInputTextAddress']
+            if filterSettings['type'] == 'select':
+                filter['selectComboBoxAddress'] = filterSettings['selectComboBoxAddress']
+
+        filtro_acoes_scraping.filter(event['filters'])
         time.sleep(2)
         html_content = selecao_acoes_scraping.pegar_tabela_resultante()
 
@@ -23,13 +33,20 @@ def lambda_handler(event, context):
             str(html_content), header=0, decimal=',', thousands='.')
         df = df_full[0]
 
-        df.columns = ['Papel', 'Cotação', 'P/L', 'P/VP', 'PSR', 'Div.Yield', 'P/Ativo', 
-                    'P/Cap.Giro', 'P/EBIT', 'P/Ativ Circ.Liq', 'EV/EBIT', 'EV/EBITDA', 
-                    'Mrg Ebit', 'Mrg. Líq.', 'Liq. Corr.', 'ROIC', 'ROE', 'Liq.2meses', 
-                    'Patrim. Líq', 'Dív.Brut/ Patrim.', 'Cresc. Rec.5a']
+        df.columns = ['papel', 'cotacao', 'preco-por-lucro', 'preco-por-valor-patrimonial', 'psr', 'dividend-yield', 'preco-por-ativo',
+                      'preco-capital-de-giro', 'preco-por-ebit', 'preco-por-ativos-circ-liquido', 'ev-por-ebit', 'ev-por-ebitda',
+                      'margem-ebit', 'margem-liquida', 'liquida-corr.', 'roic', 'roe', 'liquida-dois-meses',
+                      'patrimonio-liquido', 'divida-bruta-por-patrimonio', 'cresc-rec-cinco-a']
 
-        json_result = df.to_json(orient = 'columns')
-        return json.load(json_result)
+        json_result = df.to_json(orient='records')
+        return {
+            'statusCode': 400,
+            'body': json_result
+        }
+    except ValueError as error:
+        return {
+            'statusCode': 400,
+            'body': json.dumps(error)
+        }
     finally:
         web_scraping.finalizar()
-        return BAD_REQUEST

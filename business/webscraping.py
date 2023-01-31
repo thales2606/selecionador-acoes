@@ -1,14 +1,15 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
-
+from selenium.webdriver.chrome.options import Options
 
 class WebScraping:
 
     def __init__(self, url):
-        option = Options()
-        option.headless = True
-        self.drive = webdriver.Firefox()
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        self.drive = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=chrome_options)
         if url is not None:
             self.drive.get(url)
 
