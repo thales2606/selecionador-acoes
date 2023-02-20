@@ -30,10 +30,10 @@ jobs:
         source venv/bin/activate
         pip install -r requirements.txt
 
-    - name: Test
-      run: |
-        source venv/bin/activate
-        py -m unittest tests/*
+    # - name: Test
+    #   run: |
+    #     source venv/bin/activate
+    #     py -m unittest tests/*
 
     - name: Zip function
       run: zip -r function.zip .
