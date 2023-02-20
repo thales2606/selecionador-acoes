@@ -6,7 +6,6 @@ from business.selecao_acoes_scraping import SelecaoAcoesScraping
 from business.webscraping import WebScraping
 import time
 
-
 def lambda_handler(event, context):
     url = "https://www.fundamentus.com.br/buscaavancada.php"
     web_scraping = WebScraping(url)
