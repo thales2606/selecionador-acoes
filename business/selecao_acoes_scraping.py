@@ -1,10 +1,9 @@
 from selenium.webdriver.support.ui import Select
 
-
 class SelecaoAcoesScraping:
 
-    select_quantidade_acoes_por_pagina = '//*[@id="tabela_selecao_acoes_length"]/select'
-    quantidade_acoes_por_pagina = '1000'
+    select_quantidade_acoes_por_pagina = '//*[@id="tabela_selecao_acoes_length"]/label/select'
+    quantidade_acoes_por_pagina = '-1'
     tabela_selecao_acoes = '//*[@id="tabela_selecao_acoes"]'
 
     def __init__(self, web_scraping):

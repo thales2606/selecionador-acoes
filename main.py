@@ -14,13 +14,14 @@ principais_indicadores_scraping = PrincipaisIndicadoresScraping(web_scraping)
 
 try:
     filtro_acoes_scraping.realizar_filtro()
+    time.sleep(15)
     html_content = selecao_acoes_scraping.pegar_tabela_resultante()
 
     df_full = pandas.read_html(
         str(html_content), header=0, decimal=',', thousands='.')
     df = df_full[0]
-    df.columns = ['Ação', 'Empresa', 'Preço', 'ROInvC',
-                  'Margem EBIT', 'EV/EBIT', 'DY', 'Volume Financ.(R$)', 'Market Cap (R$)']
+    df.columns = ['Ação', 'Empresa', 'Preço', 'Data Preço', 'Data Dem.Financ.', 'Consolidação', 'ROInvC',
+                  'Margem EBIT', 'EV/EBIT', 'Div.Yield', 'Volume Financ.(R$)', 'Market Cap (R$)']
     df = Filtros().aplicar_filtros(df)
         
     df.to_excel(excel_writer='C:\\Users\\thale\\OneDrive\\Finanças\\Rancking_acoes_brasileiras.xlsx',
