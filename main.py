@@ -14,7 +14,7 @@ principais_indicadores_scraping = PrincipaisIndicadoresScraping(web_scraping)
 
 try:
     filtro_acoes_scraping.realizar_filtro()
-    time.sleep(15)
+    time.sleep(35)
     html_content = selecao_acoes_scraping.pegar_tabela_resultante()
 
     df_full = pandas.read_html(
