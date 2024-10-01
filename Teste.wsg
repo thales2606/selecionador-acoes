@@ -1,0 +1,43 @@
+@startuml
+!define RECTANGLE rectangle
+!define DATABASE database
+!define CLOUD cloud
+
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+    Shadowing false
+}
+
+CLOUD "AWS Account 1" {
+    RECTANGLE "Application" as awsApp
+}
+
+CLOUD "AWS Account 2" {
+    RECTANGLE "API Gateway" as apiGateway
+}
+
+RECTANGLE "SAP PI/PO Middleware" as piPo {
+    RECTANGLE "Sender Adapter\n(HTTP/REST/SOAP)" as senderAdapter
+    RECTANGLE "Message Mapping\n(JSON to RFC/IDoc)" as messageMapping
+    RECTANGLE "Receiver Adapter\n(RFC/IDoc/SOAP)" as receiverAdapter
+}
+
+RECTANGLE "On-Premise Network" {
+    RECTANGLE "SAP MM" as sapMM
+}
+
+' Connection between AWS accounts
+awsApp -[-> apiGateway : "Chamada REST API\nSolicitação de materiais (JSON)"
+apiGateway -[-> senderAdapter : "Encaminha requisição\nvia VPC peering/VPN"
+
+' SAP PI/PO process flow
+senderAdapter -[-> messageMapping : "Converte JSON para formato RFC/IDoc"
+messageMapping -[-> receiverAdapter : "Roteamento e Mapeamento"
+receiverAdapter -[-> sapMM : "Chamada RFC/IDoc\n(Solicitação de materiais)"
+sapMM --> receiverAdapter : "Resposta ou Confirmação"
+
+' Optional response flow
+receiverAdapter --> apiGateway : "Resposta transformada (opcional)"
+apiGateway --> awsApp : "Resposta JSON (opcional)"
+@enduml
