@@ -23,6 +23,16 @@ class WebScraping:
 
     def click(self, xPath):
         self.drive.find_element(by=By.XPATH, value=xPath).click()
+    
+    def scroll_to_element(self, xPath):
+        """
+        Faz scroll até o elemento especificado pelo XPath.
+        
+        :param xPath: O XPath do elemento até o qual o scroll será realizado.
+        """
+        elemento = self.get_element_by_xpath(xPath)
+        self.drive.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", elemento)
+
 
     def finalizar(self):
         self.drive.quit()

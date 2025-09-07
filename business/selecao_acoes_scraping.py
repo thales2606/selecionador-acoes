@@ -2,7 +2,7 @@ from selenium.webdriver.support.ui import Select
 
 class SelecaoAcoesScraping:
 
-    select_quantidade_acoes_por_pagina = '//*[@id="tabela_selecao_acoes_length"]/label/select'
+    select_quantidade_acoes_por_pagina = '//*[@id="stock_screener"]/div/div/div/div[1]/div[1]/label/select'
     quantidade_acoes_por_pagina = '-1'
     tabela_selecao_acoes = '//*[@id="tabela_selecao_acoes"]'
 
