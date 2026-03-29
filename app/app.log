@@ -1,0 +1,7 @@
+2026-03-04 04:59:57,909 - __main__ - INFO - Iniciando aplicação...
+2026-03-04 05:00:05,474 - __main__ - INFO - Iniciando aplicação...
+2026-03-04 05:00:08,210 - __main__ - INFO - Aplicação encerrada pelo usuário
+2026-03-04 20:15:17,405 - yfinance - ERROR - PETR4.SA: Period '3m' is invalid, must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
+2026-03-04 20:15:17,411 - yfinance - ERROR - 
+1 Failed download:
+2026-03-04 20:15:17,411 - yfinance - ERROR - ['PETR4.SA']: Period '3m' is invalid, must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max

@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Serviço PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: cvm_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-cvm_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cvm_password}
+      POSTGRES_DB: ${DB_NAME:-cvm_database}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cvm_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cvm_network
+
+  # Serviço de Setup do Banco de Dados
+  db-setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cvm_db_setup
+    environment:
+      POSTGRESQL_CVM_URL: postgresql://${DB_USER:-cvm_user}:${DB_PASSWORD:-cvm_password}@postgres:5432/${DB_NAME:-cvm_database}
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./app:/app
+      - ./logs:/app/logs
+    command: >
+      bash -c "
+        echo 'Aguardando PostgreSQL...';
+        sleep 5;
+        echo 'Executando setup do banco de dados...';
+        cd /app && python setup_database.py setup
+      "
+    networks:
+      - cvm_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  cvm_network:
+    driver: bridge
+

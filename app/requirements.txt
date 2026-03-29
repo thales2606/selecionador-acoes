@@ -1,0 +1,9 @@
+pydantic
+selenium
+yfinance
+pandas
+openpyxl
+lxml
+psycopg2-binary
+sqlalchemy
+requests
