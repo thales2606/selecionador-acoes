@@ -2,9 +2,12 @@ from src.common.constants import URL_INVESTSITE, URL_INVESTSITE_FINANCEIRAS, VOL
     VOLATILITY_DELAY_BETWEEN_BATCHES
 from src.domain.services.stock_extraction_service import StockExtractionService
 from src.domain.services.stock_filter_service import StockFilterService
+from src.domain.services.stock_ranking_service import StockRankingService
 from src.domain.services.stock_volatility_service import StockVolatilityService
 from src.rank.adapters.inbound.start_scraping import StartScrapingController
 from src.rank.adapters.outbound.database.excel_stock_repository import ExcelStockRepository
+from src.rank.adapters.outbound.scraping.invest_10_details_page_scraping_adapter import \
+    Invest10DetailsPageScrapingAdapter
 from src.rank.adapters.outbound.scraping.invest_site_details_page_scraping_adapter import \
     InvestSiteDetailsPageScrapingAdapter
 from src.rank.adapters.outbound.scraping.invest_site_scraping_adapter import InvestSiteScrapingAdapter
@@ -23,10 +26,12 @@ def initialize_di() -> tuple[StartScrapingController, WebScrapingDriver]:
     web_scraping = WebScrapingDriver()
     financial_adapter = InvestSiteFinancialScrapingAdapter(web_scraping)
     invest_adapter = InvestSiteScrapingAdapter(web_scraping)
-    details_adapter = InvestSiteDetailsPageScrapingAdapter(web_scraping)
+    details_invest_site_adapter = InvestSiteDetailsPageScrapingAdapter(web_scraping)
+    details_invest_10_adapter = Invest10DetailsPageScrapingAdapter(web_scraping)
 
     filter_service = StockFilterService()
     extraction_service = StockExtractionService()
+    ranking_service = StockRankingService()
     volatility_service = StockVolatilityService(
         period=VOLATILITY_PERIOD,
         batch_size=VOLATILITY_BATCH_SIZE,
@@ -36,10 +41,12 @@ def initialize_di() -> tuple[StartScrapingController, WebScrapingDriver]:
     use_case = FindStoksUseCase(
         invest_adapter,
         financial_adapter,
-        details_adapter,
+        details_invest_site_adapter,
+        details_invest_10_adapter,
         repository,
         extraction_service,
         filter_service,
+        ranking_service,
         volatility_service
     )
     return StartScrapingController(use_case), web_scraping

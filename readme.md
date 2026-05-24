@@ -1,201 +1,291 @@
 # Selecionador de Ações - Arquitetura Hexagonal
 
-Aplicação de seleção e filtragem de ações brasileiras utilizando web scraping e clean code.
+Aplicação de seleção e filtragem automática de ações brasileiras com análise de volatilidade, utilizando web scraping, Arquitetura Hexagonal e Clean Code.
 
-## setup local
+## 🎯 Objetivo
 
-```bash
-   ./.venv/Scripts/pip3.13 install -r ./app/requirements.txt
-```
-   
+Identificar automaticamente ações brasileiras seguindo critérios técnicos de análise fundamental e volatilidade, diferenciando entre empresas financeiras e não-financeiras, gerando relatório em Excel para investimento.
 
+## ⚙️ Setup Local
 
-## Arquitetura
-
-Este projeto segue os princípios da **Arquitetura Hexagonal (Ports & Adapters)** e **Clean Code**.
-
-```
-projeto/
-├── domain/              # Camada de Domínio (lógica de negócio pura)
-│   ├── entities/        # Entidades do domínio
-│   ├── services/        # Serviços de domínio (lógica de negócio)
-│   └── value_objects/   # Objetos de valor (opcional)
-├── ports/               # Interfaces (contratos)
-│   ├── inbound/         # Interfaces para entrada (casos de uso)
-│   └── outbound/        # Interfaces para saída (external services)
-├── adapters/            # Implementações dos interfaces
-│   ├── inbound/         # Adaptadores de entrada (controllers, CLI)
-│   └── outbound/        # Adaptadores de saída (web drivers, repositories)
-├── application/         # Camada de aplicação (casos de uso)
-│   ├── use_cases/       # Casos de uso (orquestração)
-│   └── dto/             # Data Transfer Objects
-├── config.py            # Configurações da aplicação
-└── main.py              # Ponto de entrada
-```
-
-## Componentes Principais
-
-### Domain (Camada de Domínio)
-
-**Entidades:**
-- `Stock`: Entidade de ação com atributos principais
-
-**Serviços:**
-- `StockFilterService`: Lógica de filtros de ações
-- `StockExtractionService`: Extração de dados de ações
-
-### Ports (Interfaces)
-
-**Inbound:**
-- `FindStoksUseCasePort`: Interface para buscar stocks
-
-**Outbound:**
-- `WebScrapingPort`: Interface para web scraping
-- `StockFilterPort`: Interface para filtros
-- `StockRepositoryPort`: Interface para persistência
-
-### Adapters (Implementações)
-
-**Inbound:**
-- `StartScrapingController`: Controlador CLI que orquestra todo o fluxo
-
-**Outbound:**
-- `WebScrapingDriver`: Driver do Selenium implementando WebScrapingPort
-- `InvestSiteScrapingAdapter`: Adapter para scraping de ações não-financeiras
-- `InvestSiteFinancialScrapingAdapter`: Adapter para scraping de ações financeiras
-- `DataFrameStockFilterAdapter`: Adapter de filtros com pandas
-- `ExcelStockRepository`: Adapter para salvar em Excel
-
-### Application (Casos de Uso)
-
-- `FindStoksUseCase`: Orquestra a busca e filtragem de ações
-
-## Critérios de Seleção de Ativos
-
-Os filtros são aplicados em duas etapas:
-
-### Etapa 1: Filtros no Site InvestSite (Pré-Filtragem)
-
-1. **Volume Financeiro Mínimo: R$ 3.000.000**
-   - Reduz risco operacional
-   - Garante liquidez adequada para execução de operações
-   - Reduz custo de transação
-
-2. **Margem EBIT Mínima: 0%**
-   - Remove empresas com margem EBIT negativa
-   - Prioriza empresas com operações rentáveis
-
-3. **Colunas Selecionadas para Análise:**
-   - ROI (Retorno sobre Investimento)
-   - Margem EBIT
-   - EV/EBIT (múltiplo de valuation)
-   - Dividend Yield (DY)
-   - Volume Financeiro
-   - Market Cap (Capitalização de Mercado)
-
-### Etapa 2: Filtros Aplicados no Processamento de Dados
-
-1. **Remoção de Seguradoras**
-   - Remove: SUL AMÉRICA, PORTO SEGURO
-   - Evita distorções causadas por empresas do setor de seguros
-
-2. **Remoção de BDRs (Brazilian Depositary Receipts)**
-   - Remove ações que contenham '33' no ticker
-   - Foca em ações ordinárias listadas na B3
-
-3. **Deduplicação por Volume Financeiro**
-   - Remove duplicatas mantendo apenas a ação com maior volume
-   - Garante uma única entrada por empresa
-
-4. **Remoção de Registros sem Margem EBIT**
-   - Remove linhas com valores ausentes na coluna Margem EBIT
-   - Garante dados completos para análise
-
-5. **Ordenação e Ranking por EV/EBIT**
-   - Ordena em ordem ascendente (ações mais baratas primeiro)
-   - Cria ranking para facilitar análise de valuation
-
-## Como Usar
+### Pré-requisitos
+- Python 3.11+
+- pip ou conda
+- Firefox (para Selenium WebDriver)
+- GeckoDriver (já incluído no projeto)
 
 ### Instalação
 
 ```bash
-pip install -r requirements.txt
+# Criar ambiente virtual
+python -m venv .venv
+
+# Ativar ambiente virtual (Windows)
+.\.venv\Scripts\activate
+
+# Instalar dependências
+pip install -r ./app/requirements.txt
 ```
 
-### Executar
+## 🏗️ Arquitetura
 
-#### Buscar ações não-financeiras
-```python
-from dependency_injection import initialize_di
+Este projeto segue os princípios da **Arquitetura Hexagonal (Ports & Adapters)**, **Clean Code** e **Domain-Driven Design**.
 
-controller = initialize_di(financial=False)
-controller.start_scraping()
+### Estrutura de Pastas
+
+```
+app/
+├── src/
+│   ├── common/              # Constantes e configurações compartilhadas
+│   │   └── constants.py     # URLs, timeouts, paths
+│   ├── domain/              # Lógica de negócio pura (independente de frameworks)
+│   │   ├── services/        # Serviços de domínio
+│   │   │   ├── stock_extraction_service.py
+│   │   │   ├── stock_filter_service.py
+│   │   │   └── stock_volatility_service.py
+│   │   └── value_objects/   # Objetos de valor
+│   └── rank/                # Módulo principal (casos de uso e adapters)
+│       ├── adapters/        # Implementações de interfaces
+│       │   ├── inbound/     # Controllers/entry points
+│       │   │   └── start_scraping.py
+│       │   └── outbound/    # Implementações de saída
+│       │       ├── scraping/        # Web scraping
+│       │       │   ├── web_scraping_driver.py
+│       │       │   ├── invest_site_scraping_adapter.py
+│       │       │   ├── invest_site_financial_scraping_adapter.py
+│       │       │   ├── invest_site_details_page_scraping_adapter.py
+│       │       │   └── invest_10_details_page_scraping_adapter.py
+│       │       └── database/        # Persistência
+│       │           └── excel_stock_repository.py
+│       ├── application/     # Casos de uso
+│       │   ├── find_stoks_use_case.py
+│       │   └── dto/         # Data Transfer Objects
+│       └── ports/           # Interfaces (contratos)
+│           ├── inbound/
+│           └── outbound/
+├── dependency_injection.py  # Configuração de injeção de dependências
+├── main.py                  # Ponto de entrada
+└── requirements.txt         # Dependências
 ```
 
-#### Buscar ações de empresas financeiras
-```python
-from dependency_injection import initialize_di
+### Camadas Arquiteturais
 
-controller = initialize_di(financial=True)
-controller.start_scraping()
+#### 1. **Domain (Lógica de Negócio Pura)**
+
+**Serviços:**
+- `StockExtractionService`: Extrai dados de ações do HTML
+- `StockFilterService`: Aplica regras de filtro (remove seguradoras, BDRs, duplicatas)
+- `StockVolatilityService`: Calcula volatilidade anual via yfinance
+
+### Ports (Interfaces)
+
+**Inbound:**
+
+#### 2. **Ports (Interfaces/Contratos)**
+
+**Inbound:**
+- `FindStoksUseCasePort`: Interface do caso de uso principal
+
+**Outbound:**
+- `InvestSiteScrapingPort`: Interface para web scraping de ações
+- `DetailsPageScrapingPort`: Interface para scraping de detalhes de ações
+- `StockRepositoryPort`: Interface para persistência de dados
+
+#### 3. **Adapters (Implementações)**
+
+**Inbound:**
+- `StartScrapingController`: Entry point que orquestra o fluxo de scraping
+
+**Outbound - Scraping:**
+- `WebScrapingDriver`: Encapsula Selenium WebDriver (Firefox)
+- `InvestSiteScrapingAdapter`: Scraping de ações não-financeiras
+- `InvestSiteFinancialScrapingAdapter`: Scraping de ações financeiras
+- `InvestSiteDetailsPageScrapingAdapter`: Detalhes de ações (InvestSite)
+- `Invest10DetailsPageScrapingAdapter`: Detalhes de ações (Investidor10)
+
+**Outbound - Persistência:**
+- `ExcelStockRepository`: Salva resultados em arquivo Excel
+
+#### 4. **Application (Casos de Uso)**
+
+- `FindStoksUseCase`: Orquestra todo o fluxo:
+  1. Realiza scraping de ações não-financeiras
+  2. Realiza scraping de ações financeiras
+  3. Combina resultados
+  4. Calcula volatilidade
+  5. Aplica filtros de negócio
+  6. Enriquece com detalhes
+  7. Salva em Excel
+
+## 📊 Fluxo de Execução
+
+```
+┌─────────────────────────────────────────┐
+│   StartScrapingController.start_scraping()
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  FindStoksUseCase.execute()              │
+└──────────────┬──────────────────────────┘
+               │
+        ┌──────┴──────┐
+        │             │
+        ▼             ▼
+  Scraping NF    Scraping FIN
+  (35s wait)     (35s wait)
+        │             │
+        └──────┬──────┘
+               ▼
+     Merge DataFrames
+               ▼
+    Calcular Volatilidade
+               ▼
+     Aplicar Filtros
+               ▼
+   Enriquecer com Detalhes
+               ▼
+    Salvar em Excel
 ```
 
-Ou diretamente no `main.py`:
+## 📋 Critérios de Seleção
+
+### Filtros no Site InvestSite (Pré-Filtragem)
+
+#### Ações Não-Financeiras
+- **Volume Financeiro Mínimo:** R$ 3.000.000
+- **Margem EBIT Mínima:** 0%
+- **Colunas Selecionadas:** ROI, Margem EBIT, EV/EBIT, DY, Volume, Market Cap
+
+#### Ações Financeiras
+- **Volume Diário Médio Mínimo:** R$ 3.000.000 (últimos 3 meses)
+- **Colunas Selecionadas:** ROE, Margem Líquida, Alavancagem, P/E, P/B, DY, Volume Diário, Market Cap
+
+### Filtros na Aplicação (Pós-Filtragem)
+
+1. **Remoção de Seguradoras**
+   - Remove empresas do setor de seguros que distorcem análise fundamental
+
+2. **Remoção de BDRs (Brazilian Depositary Receipts)**
+   - Mantém apenas ações ordinárias (remove tickers com '33')
+
+3. **Deduplicação por Volume**
+   - Uma ação por empresa, mantendo a com maior volume financeiro
+
+4. **Validação de Dados**
+   - Remove registros com valores ausentes em colunas críticas
+
+5. **Ranking por Valuation**
+   - Ordena por EV/EBIT (múltiplo de valuation)
+
+### Enriquecimento de Dados
+
+- **Volatilidade Anual:** Calculada via yfinance (1 ano de dados)
+- **Detalhes Técnicos:** Scraped de InvestSite e Investidor10
+  - Dividend Yield atualizado
+  - Últimas cotações
+  - Outros indicadores técnicos
+
+## 🚀 Como Usar
+
+### Executar Aplicação
 
 ```bash
-python main.py
+# Ativar ambiente virtual
+.\.venv\Scripts\activate
+
+# Executar
+python app/main.py
 ```
 
-## Suporte a Ações Financeiras e Não-Financeiras
+### Customizar Execução
 
-A aplicação agora suporta a busca de dois tipos de ações:
+Editar `app/dependency_injection.py` e `app/src/common/constants.py` para:
+- Mudar caminho do arquivo de saída (`OUTPUT_FILE`)
+- Ajustar timeouts (`WAIT_TIME_AFTER_FILTER`)
+- Modificar parâmetros de filtro (`VOLUME_MINIMO`, `MARGEM_EBIT_MINIMO`)
+- Configurar headless mode (`WEBDRIVER_HEADLESS`)
 
-### Ações Não-Financeiras
-- **URL**: `https://www.investsite.com.br/seleciona_acoes.php`
-- **Adapter**: `InvestSiteScrapingAdapter`
-- **Uso**: `initialize_di(financial=False)` ou `initialize_di()`
+### Exemplo de Uso Programático
 
-Filtros aplicados:
-- Volume Financeiro Mínimo: R$ 3.000.000
-- Margem EBIT Mínima: 0%
-- Colunas: ROI, Margem EBIT, EV/EBIT, DY, Volume e Market Cap
+```python
+from app.dependency_injection import initialize_di
 
-### Ações de Empresas Financeiras
-- **URL**: `https://www.investsite.com.br/seleciona_acoes_financ.php`
-- **Adapter**: `InvestSiteFinancialScrapingAdapter`
-- **Uso**: `initialize_di(financial=True)`
+# Inicializar injeção de dependências
+controller, web_scraping = initialize_di()
 
-Filtros aplicados para ações financeiras:
-- Volume Diário Médio Mínimo: R$ 3.000.000 (últimos 3 meses)
-- Colunas: ROE, Margem Líquida, Alavancagem, P/E, P/B, DY, Volume Diário e Market Cap
+try:
+    # Executar scraping e filtragem
+    controller.start_scraping()
+finally:
+    # Liberar recursos
+    web_scraping.close()
+```
 
+## 🔧 Tecnologias Utilizadas
 
+| Tecnologia | Versão | Propósito |
+|------------|--------|----------|
+| Python | 3.11+ | Linguagem principal |
+| Selenium | 4.x | Web scraping/automation |
+| Firefox | Latest | Navegador para Selenium |
+| Pandas | 2.x | Processamento de dados |
+| OpenPyXL | 3.x | Escrita em Excel |
+| yfinance | Latest | Dados financeiros |
+| SQLAlchemy | 2.x | ORM (para futuro) |
+| Pydantic | 2.x | Validação de dados |
 
-1. **Independência de Frameworks**: A lógica de negócio não depende de bibliotecas externas
-2. **Testabilidade**: Interfaces permitem fácil criação de mocks
-3. **Manutenibilidade**: Código organizado em camadas bem definidas
-4. **Escalabilidade**: Fácil adicionar novos adaptadores
-5. **Flexibilidade**: Trocar implementações sem afetale regra de negócio
+## 📦 Dependências Principais
 
-## Exemplos de Extensão
+```
+pydantic          # Validação e serialização de dados
+selenium          # Web automation e scraping
+yfinance          # Dados históricos de ações
+pandas            # Processamento de dados tabulares
+openpyxl          # Leitura/escrita de arquivos Excel
+lxml              # Parsing de HTML/XML
+sqlalchemy        # ORM e acesso a banco de dados
+psycopg2-binary   # Driver PostgreSQL
+requests          # Requisições HTTP
+```
 
-### Adicionar novo repositório (ex: Banco de Dados)
+Veja `app/requirements.txt` para todas as dependências.
 
-1. Criar adapter em `adapters/outbound/database/db_stock_repository.py`
+## 🧪 Padrões de Design Utilizados
+
+- **Hexagonal Architecture**: Separação clara entre domínio, ports e adapters
+- **Dependency Injection**: Facilita testes e manutenção
+- **Strategy Pattern**: Diferentes adapters para diferentes fontes de dados
+- **Template Method**: `FindStoksUseCase.execute()` define o fluxo padrão
+- **Factory Pattern**: `initialize_di()` cria instâncias configuradas
+- **Repository Pattern**: Abstração de persistência
+- **Service Layer**: Serviços de domínio independentes
+
+## ✨ Benefícios da Arquitetura
+
+1. **Independência de Frameworks**: Lógica de negócio não depende de bibliotecas externas
+2. **Testabilidade**: Interfaces permitem criar mocks facilmente
+3. **Manutenibilidade**: Código bem organizado em camadas
+4. **Escalabilidade**: Fácil adicionar novos adapters (novos sites, repositórios, etc.)
+5. **Flexibilidade**: Trocar implementações sem afetar regra de negócio
+6. **Reutilização**: Componentes podem ser reutilizados em diferentes contextos
+
+## 🔌 Extensibilidade
+
+### Adicionar Novo Site de Scraping
+
+1. Criar novo adapter em `src/rank/adapters/outbound/scraping/`
+2. Implementar `InvestSiteScrapingPort`
+3. Registrar em `dependency_injection.py`
+
+### Adicionar Novo Repositório
+
+1. Criar adapter em `src/rank/adapters/outbound/database/`
 2. Implementar `StockRepositoryPort`
-3. Atualizar `StartScrapingController`
+3. Usar em `FindStoksUseCase`
 
-### Adicionar novo seletor de site
+### Adicionar Novo Serviço
 
-1. Criar adapter em `adapters/outbound/scraping/novo_site_adapter.py`
-2. Implementar a interface necessária
-3. Usá-lo no controlador inbound
-
-## Padrões de Design Utilizados
-
-- **Strategy**: Diferentes filtros via `StockFilterService`
-- **Adapter**: Conversão de interfaces externas
-- **Dependency Injection**: Injeção de dependências
-- **Repository**: Abstração de persistência
-- **Service Layer**: Serviços de domínio
+1. Criar classe em `src/domain/services/`
+2. Injetar em `FindStoksUseCase`
+3. Chamar no método apropriado

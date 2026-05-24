@@ -12,6 +12,7 @@ from src.common.constants import (
 )
 from src.domain.services.stock_extraction_service import StockExtractionService
 from src.domain.services.stock_filter_service import StockFilterService
+from src.domain.services.stock_ranking_service import StockRankingService
 from src.domain.services.stock_volatility_service import StockVolatilityService
 from src.rank.adapters.outbound.scraping.invest_site_financial_scraping_adapter import \
     InvestSiteFinancialScrapingAdapter
@@ -27,18 +28,22 @@ class FindStoksUseCase(FindStoksUseCasePort):
     def __init__(self,
                  invest_adapter: InvestSiteScrapingPort,
                  financial_adapter: InvestSiteFinancialScrapingAdapter,
-                 details_adapter: DetailsPageScrapingPort,
+                 details_invest_site_adapter: DetailsPageScrapingPort,
+                 details_invest_10_adapter: DetailsPageScrapingPort,
                  repository: StockRepositoryPort,
                  extraction_service: StockExtractionService,
                  filter_service: StockFilterService,
+                 ranking_service: StockRankingService,
                  volatility_service: StockVolatilityService = None
                  ):
         self._invest_adapter = invest_adapter
         self._financial_adapter = financial_adapter
-        self._details_adapter = details_adapter
+        self._details_invest_site_adapter = details_invest_site_adapter
+        self._details_invest_10_adapter = details_invest_10_adapter
         self._repository = repository
         self._extraction_service = extraction_service
         self._filter_service = filter_service
+        self._ranking_service = ranking_service
         self._volatility_service = volatility_service or StockVolatilityService(
             period=VOLATILITY_PERIOD,
             batch_size=VOLATILITY_BATCH_SIZE,
@@ -61,9 +66,18 @@ class FindStoksUseCase(FindStoksUseCasePort):
 
         # Calcula volatilidade no dataframe combinado
         df_with_volatility = self._calculate_volatility(df_combined)
-        df_with_volatility = self._apply_filters(df_with_volatility)
-        df_with_volatility = self._enrich_with_details(df_with_volatility)
-        self._save_results(df_with_volatility)
+        
+        # REORDENADO: Enriquecimento ANTES dos filtros
+        df_enriched = self._enrich_with_details(df_with_volatility)
+        
+        # Aplica filtros agora com dados enriquecidos
+        df_filtered = self._apply_filters(df_enriched)
+        
+        # Calcula indicadores de ranking
+        df_ranked = self._apply_ranking(df_filtered)
+        
+        # Salva resultados
+        self._save_results(df_ranked)
 
     def _perform_scraping(self, financials: bool) -> str:
         """Realiza o scraping no site investsite"""
@@ -96,13 +110,18 @@ class FindStoksUseCase(FindStoksUseCasePort):
         """Scrapa detalhes de cada ação e adiciona como novas colunas"""
         print("\nCapturando detalhes das ações...")
 
+        # Reseta o índice para garantir que fique sequencial (0, 1, 2, ...)
+        df_reset = df.reset_index(drop=True)
+
         # Inicializa listas para armazenar os detalhes
         details_list = []
 
         # Itera sobre cada ação e faz o scraping dos detalhes
-        for idx, row in df.iterrows():
+        for idx, row in df_reset.iterrows():
             stock_code = row.iloc[0]  # Primeira coluna contém o código da ação
-            details = self._details_adapter.scrape_details_page(stock_code)
+            # if row['Financeira'] != 'Sim':
+            #     continue
+            details = self._scrape_details_page(stock_code, row['Financeira'] == 'Sim')
             details_list.append(details)
             print(f"Detalhes obtidos para {stock_code}")
             time.sleep(1)
@@ -110,11 +129,23 @@ class FindStoksUseCase(FindStoksUseCasePort):
         # Cria um dataframe com os detalhes
         df_details = pd.DataFrame(details_list)
 
-        # Concatena as colunas de detalhes ao dataframe original
-        df_enriched = pd.concat([df, df_details], axis=1)
+        # Concatena as colunas de detalhes ao dataframe original usando índices alinhados
+        df_enriched = pd.concat([df_reset, df_details], axis=1)
 
         print("Detalhes adicionados ao resultado!")
         return df_enriched
+
+    def _scrape_details_page(self, stock_code: str, financial: bool) -> dict:
+        invest_site_details = self._details_invest_site_adapter.scrape_details_page(stock_code, financial)
+        invest_10_details = self._details_invest_10_adapter.scrape_details_page(stock_code, financial)
+        return {
+            'lucro_liquido_anual': invest_10_details['lucro_liquido_anual'],
+            'lucro_liquido_trimestral': invest_10_details['lucro_liquido_trimestral'],
+            'patrimonio_liquido': invest_10_details['patrimonio_liquido'],
+            'situacao_empresa': invest_site_details['situacao_empresa'],
+            'imposto_anual': invest_10_details['imposto_anual'],
+            'imposto_trimestral': invest_10_details['imposto_trimestral']
+        }
 
     def _save_results(self, df: pd.DataFrame) -> None:
         """Salva os resultados em um arquivo Excel"""
@@ -122,3 +153,9 @@ class FindStoksUseCase(FindStoksUseCasePort):
         self._repository.save_dataframe(df=df, file_path=OUTPUT_FILE, sheet_name=OUTPUT_SHEET)
         print("Salvamento concluído com sucesso!")
 
+    def _apply_ranking(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Calcula indicadores de ranking"""
+        print("Calculando indicadores de ranking...")
+        df_ranked = self._ranking_service.calculate_ranking_indicators(df)
+        print("Indicadores de ranking calculados com sucesso!")
+        return df_ranked

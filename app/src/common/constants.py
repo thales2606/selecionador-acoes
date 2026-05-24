@@ -3,6 +3,7 @@
 URL_INVESTSITE = "https://www.investsite.com.br/seleciona_acoes.php"
 URL_INVESTSITE_FINANCEIRAS = "https://www.investsite.com.br/seleciona_acoes_financ.php"
 URL_INVESTSITE_DETAILS = "https://www.investsite.com.br/principais_indicadores.php?cod_negociacao="
+URL_INVEST10_DETAILS = "https://investidor10.com.br/acoes/"
 
 # Caminho do arquivo de saída
 OUTPUT_FILE = r'C:\Users\thale\OneDrive\Finanças\rancking_acoes_brasileiras.xlsx'

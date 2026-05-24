@@ -13,7 +13,7 @@ class StockExtractionService:
     ]
     FINANCIAL_COLUMN_NAMES = [
         'Ação', 'Empresa', 'Preço', 'Data Preço', 'Data Dem.Financ.',
-        'Consolidação', 'Margem Líquida', 'Div.Yield', 'Market Cap (R$)', 'Volume Financ.(R$)'
+        'Consolidação', 'Margem Líquida', 'Div.Yield', 'Volume Financ.(R$)', 'Market Cap (R$)'
     ]
     def extract_from_html(self, html_content: str, financials: bool) -> pd.DataFrame:
         """Extrai dados de stocks do HTML"""
