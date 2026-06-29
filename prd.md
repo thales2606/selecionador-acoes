@@ -6,7 +6,7 @@
 
 Atualmente, o processo logístico permite que fiscais de obras reservem materiais informando uma data de necessidade. Para fechar o ciclo de atendimento com o armazém, este produto introduzirá o fluxo de **Acionamento de Entrega**.
 
-O objetivo da solução (desenvolvida pela Squad ELO) é permitir que as reservas sejam convertidas em ordens de saída logísticas precisas, garantindo flexibilidade para entregas parciais e registrando de forma definitiva o agendamento logístico para consumo posterior do sistema WMS.
+O objetivo da solução é permitir que as reservas sejam convertidas em ordens de saída logísticas precisas, garantindo flexibilidade para entregas parciais e registrando de forma definitiva o agendamento logístico para consumo posterior do sistema WMS.
 
 ## 2. Perfis de Usuário
 
@@ -32,7 +32,7 @@ O sistema deve suportar o seguinte fluxo principal:
 A interface deve priorizar a eficiência operacional, com as seguintes premissas visuais e de interação:
 
 * **Estética Clean e Minimalista:** Uso consciente de espaços em branco (white space), remoção de textos redundantes e foco absoluto na legibilidade dos dados logísticos.
-* **Identidade Visual:** Aplicação das cores institucionais do Itaú para alinhamento com o ecossistema atual, garantindo familiaridade aos usuários.
+* **Identidade Visual:** Aplicação das cores institucionais para alinhamento com o ecossistema atual, garantindo familiaridade aos usuários.
 * **Componentes:** Utilização de bordas arredondadas (rounded borders) para botões, modais e *cards* de informação.
 * **Telas Necessárias:**
 * Listagem de histórico de acionamentos da agência (com paginação).
