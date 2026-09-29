@@ -1,0 +1,2 @@
+Restart-Service -Name "LWSpotterSvc", "LWSpotterUpdateSvc" -ErrorAction SilentlyContinue
+Clear-DnsClientCache
