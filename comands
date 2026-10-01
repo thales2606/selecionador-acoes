@@ -1,2 +1,15 @@
-Restart-Service -Name "LWSpotterSvc", "LWSpotterUpdateSvc" -ErrorAction SilentlyContinue
-Clear-DnsClientCache
+Get-WinEvent -LogName "Microsoft-Windows-DNS-Client/Operational" -ErrorAction SilentlyContinue | 
+    Where-Object { $_.Id -eq 8001 -or $_.Id -eq 8002 -or $_.Id -eq 1014 } | 
+    Select-Object TimeCreated, Id, Message | 
+    Format-List
+
+
+Get-WinEvent -FilterHashtable @{LogName='System'; ProviderName='Microsoft-Windows-DHCP-Client'} -ErrorAction SilentlyContinue | 
+    Select-Object TimeCreated, Id, Message | 
+    Format-List
+
+
+Get-EventLog -LogName System -After (Get-Date).AddDays(-2) | 
+    Where-Object { $_.Source -like "*Tcpip*" -or $_.Source -like "*DHCP*" } | 
+    Select-Object TimeGenerated, EventID, Source, Message | 
+    Format-Table -AutoSize -Wrap
