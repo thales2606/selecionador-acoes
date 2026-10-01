@@ -13,3 +13,9 @@ Get-EventLog -LogName System -After (Get-Date).AddDays(-2) |
     Where-Object { $_.Source -like "*Tcpip*" -or $_.Source -like "*DHCP*" } | 
     Select-Object TimeGenerated, EventID, Source, Message | 
     Format-Table -AutoSize -Wrap
+
+Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" | 
+    Select-Object NameServer, DhcpNameServer, DhcpIPAddress | 
+    Format-List
+
+Select-String -Path "C:\Windows\Temp\SpotterAgentSetup.log" -Pattern "DNS", "NAMESERVER", "Server" | Select-Object -ExpandProperty Line
